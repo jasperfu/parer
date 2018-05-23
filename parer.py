@@ -24,17 +24,21 @@ with open('batch63 raw.csv', newline='') as f:
         keep = False
         gap = False
         for row in reader:
-            if p7 > max(p1, float(row[1]), p2, p3, p4, p5, p6, p8, p9, p10, p11, p12, p13, p14, 1):
+            if p7 > max(p1, float(row[1]), p2, p3, p4, p5, p6,
+                        p8, p9, p10, p11, p12, p13, p14, 1)
+               and not morePrev:
                 morePrev = prevPoint
                 prevPoint = keep
                 keep = True
                 print("up")
-            elif p7 < min(p1, float(row[1]), p2, p3, p4, p5, p6, p8, p9, p10, p11, p12, p13, p14, -1):
+            elif p7 < min(p1, float(row[1]), p2, p3, p4, p5, p6,
+                          p8, p9, p10, p11, p12, p13, p14, -1)
+                          and morePrev:
                 morePrev = prevPoint
                 prevPoint = keep
                 keep = False
                 print("down")
-            if keep and not morePrev:
+            if keep:
                 writer.writerow(next(reader) + [batchId])
                 gap = False
             elif gap == False:
