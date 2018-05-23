@@ -1,7 +1,15 @@
 import csv
+import time
+import datetime
+
+def epoch(t):
+    pattern = '%Y-%m-%d %H:%M:%S.%f'
+    epoch = datetime.datetime.strptime(t, pattern)
+    return (epoch.timestamp())
+
 with open('dataload03262018.csv', newline='') as f:
     reader = csv.reader(f)
-    with open('keeptrying.csv', 'w', newline='') as w:
+    with open('betterHMSweirdepoch.csv', 'w', newline='') as w:
         writer = csv.writer(w)
         writer.writerow(next(reader))
         batchId = 0
@@ -19,7 +27,6 @@ with open('dataload03262018.csv', newline='') as f:
         p12 = 0
         p13 = 0
         p14 = 0
-        badcounter = 0
         prevPoint = True
         keep = False
         gap = False
@@ -30,26 +37,17 @@ with open('dataload03262018.csv', newline='') as f:
                 keep = True
                 print("up:")
                 print(p7)
-                if counter > 250:
-                    print("baaaaaaaaaaaaaaaaaaaaaaad")
-                    badcounter += 1
-                print("counter: " + str(counter))
-                counter = 0
             elif (p7 < min(p1, float(row[1]), p2, p3, p4, p5, p6, p8, p9, p10, p11, p12, p13, p14, -1)) and prevPoint:
                 prevPoint = keep
                 keep = False
                 print("down:")
                 print(p7)
-                print("counter: " + str(counter))
-                counter = 0
             if keep:
-                writer.writerow(next(reader) + [batchId])
+                writer.writerow(row[:4] + [epoch(row[4])]  + [batchId])
                 gap = False
             elif gap == False:
                 batchId += 1
                 gap = True
-            counter += 1
-
             p14 = p13
             p13 = p12
             p12 = p11
@@ -64,7 +62,3 @@ with open('dataload03262018.csv', newline='') as f:
             p3 = p2
             p2 = p1
             p1 = float(row[1])
-
-def hms_to_seconds(t):
-    h, m, s = [int(i) for i in t.split(':')]
-    return 3600*h + 60*m + s
